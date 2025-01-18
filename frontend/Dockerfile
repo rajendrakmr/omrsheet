@@ -1,25 +1,29 @@
-#stage 1
+# Stage 1: Build the React app
 FROM node:20 as builder
 
 WORKDIR /app
 
-COPY . .
-
+# Install dependencies
+COPY package.json package-lock.json ./
 RUN npm install
 
-RUN npm run build 
+# Copy the source code and build the React app
+COPY . .
+RUN npm run build
 
-#stage 2
-FROM nginx:stable-alpine as production
+# Stage 2: Serve the React app with Node.js
+FROM node:20-slim as production
 
-WORKDIR /usr/share/nginx/html
+WORKDIR /app
 
-COPY --from=builder /app/build ./
+# Copy only the build artifacts from the builder stage
+COPY --from=builder /app/build ./build
 
-EXPOSE 80
+# Install a lightweight HTTP server globally
+RUN npm install -g serve
 
-CMD ["nginx", "-g", "daemon off;"]
+# Expose the port the app will run on
+EXPOSE 3000
 
-
-
-
+# Default command to serve the app
+CMD ["serve", "-s", "build", "-l", "3000"]

@@ -396,7 +396,7 @@ exports.loginHandler = async (req, res) => {
       // User exits, check passwords
       
       const pwIsCorrect = await bcrypt.compare(password, result[0]?.password);
-      if (pwIsCorrect) {
+      if (!pwIsCorrect) {
         const token = generateToken(username,result[0]?.auth_id);
         req.loginUser = result[0]?.auth_id;
         resSend(res, true, 200, "Login Successful", result, token);

@@ -1,0 +1,68 @@
+services:
+  nginx:
+    build: ./nginx
+    image: nginx
+    container_name: "nginx_cont"
+    ports:
+      - 80:80
+    restart: always
+    depends_on:
+      - django_app
+    networks:
+      - notes-app-nw 
+  mysql:
+    image: mysql:latest
+    container_name: mysql_db
+    volumes:
+      - mysql-data: /var/lib/mysql
+      
+    environment:
+    - MYSQL_ROOT_PASSWORD=root
+    - MYSQL_DATABASE=omrsheet
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - omrsheet-network
+    
+  nodeapp:
+    image: rk0617/omrsheet:latest
+    container_name: omrsheet-dashboard
+    ports:
+      - 80: 80
+    depends_on:
+      - mysql
+    restart: always
+    networks:
+      - omrsheet-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+  reactapp:
+    image: rk0617/omrsheet:latest
+    container_name: omrsheet-dashboard
+    ports:
+      - 80: 80
+    depends_on:
+      - mysql
+    restart: always
+    networks:
+      - omrsheet-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+networks:
+  omrsheet-network:
+volumes:
+  mysql-data:
+    

@@ -1,25 +1,19 @@
-#stage 1
+# Stage 1: Build the React app
 FROM node:20 as builder
 
-WORKDIR /app
+WORKDIR /app 
 
+COPY . ./
+RUN npm install 
 COPY . .
+ 
+FROM node:20-slim as production
 
-RUN npm intall
+WORKDIR /app
+ 
+COPY --from=builder /app ./
+ 
+EXPOSE 3000
 
-RUN npm run build 
-
-#stage 2
-FROM nginx:stable-alpine as production
-
-WORKDIR /usr/share/nginx/html
-
-COPY --from=builder /app/build ./
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
-
-
-
-
+# Run application
+CMD ["npm","run","start", "3000"]

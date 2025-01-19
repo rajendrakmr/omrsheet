@@ -1,19 +1,19 @@
-#stage 1
+# Stage 1
 FROM node:20 as builder
 
 WORKDIR /app
 
 COPY . ./
 
-RUN npm intall 
+RUN npm install 
 
-#stage 2
+# Stage 2
 FROM node:20-slim as production
 
 WORKDIR /app
 
-COPY --from=builder /app ./app
+COPY --from=builder /app ./
 
 EXPOSE 4000
 
-CMD ["npm", "run"]
+CMD ["npm", "run", "start"]

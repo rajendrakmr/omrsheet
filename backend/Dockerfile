@@ -3,11 +3,9 @@ FROM node:20 as builder
 
 WORKDIR /app
 
-COPY . .
+COPY . ./
 
-RUN npm intall
-
-RUN npm run build 
+RUN npm intall 
 
 #stage 2
 FROM node:20-slim as production
